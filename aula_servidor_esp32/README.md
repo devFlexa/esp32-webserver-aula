@@ -1,6 +1,6 @@
 # Servidor web na ESP32
 
-Abra **esta pasta** como projeto PlatformIO. O projeto existente na pasta superior e um teste de GPIO separado.
+Abra **esta pasta** como projeto PlatformIO. O teste independente de GPIO está em `../exemplos/teste_gpio/`.
 
 1. Conecte um LED e um resistor de 220 a 1000 ohms em serie entre **GPIO 21** e **GND** (anodo voltado ao GPIO).
 2. Execute **Upload** para gravar o firmware.

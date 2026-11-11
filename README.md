@@ -1,16 +1,27 @@
-# Teste de GPIO do ESP32 com PlatformIO
+﻿# ESP32 como servidor web — aula prática
 
-Projeto para **ESP32 DevKit / ESP32-WROOM**, com framework Arduino. Se a sua placa for outro modelo (ESP8266, ESP32-S3, ESP32-C3 etc.), ajuste `board` em `platformio.ini` e a lista de pinos em `src/main.cpp` antes de gravar.
+Material para jovens de 14 a 16 anos, com diagramas, simulador de requisições HTTP, atividades e quiz.
 
-## Gravar e testar
+## Comece pela aula
 
-1. Abra esta pasta no VS Code com a extensao PlatformIO.
-2. Conecte o ESP32 por USB e use **PlatformIO: Upload**.
-3. Abra **PlatformIO: Serial Monitor** em **115200 baud**. Configure o fim de linha como **Newline**.
-4. Envie `pinos` para ver os GPIOs disponiveis.
-5. Para testar uma saida, conecte um LED com resistor de 220 a 1000 ohms entre o GPIO escolhido e GND. Envie `pulso 21`, por exemplo. O LED deve piscar tres vezes.
-6. Para testar uma entrada, envie `entrada 21`, conecte temporariamente o GPIO 21 ao GND e envie `ler 21`. Sem a conexao, a leitura sera `HIGH`; com ela, `LOW`.
+Baixe o repositório e abra `aula_esp32.html` no navegador. A aula funciona offline e explica conceitos, montagem, programação e testes.
 
-Tambem ha comandos `saida N`, `alto N` e `baixo N` para controle manual. `entrada N` libera o pino depois do teste. GPIOs 34, 35, 36 e 39 so podem ser entradas e **nao possuem pull-up interno**; use um resistor externo para definir seu nivel. O programa nao altera os GPIOs automaticamente ao iniciar.
+## Projeto da ESP32
 
-**Cuidados:** use somente sinais de 3,3 V; nao ligue um GPIO diretamente a 5 V. Confira o esquema da sua placa e desconecte dispositivos externos antes de testar pinos que possam estar ligados a eles.
+Abra a pasta `aula_servidor_esp32` no VS Code com a extensão PlatformIO. O projeto usa ESP32 DevKit / ESP32-WROOM e framework Arduino.
+
+1. Ligue GPIO 21 → resistor de 220 a 1000 Ω → ânodo do LED; cátodo → GND.
+2. Execute **Upload** para gravar o firmware.
+3. Execute **Upload Filesystem Image** para enviar a página.
+4. Conecte-se à rede **ESP32-Aula**, senha **AulaESP32**.
+5. Abra **http://192.168.4.1** no navegador.
+
+Use o Monitor Serial em **115200 baud**. As instruções completas estão no README do projeto e na aula.
+
+## Organização
+
+- `aula_esp32.html`: aula ilustrada e interativa.
+- `aula_servidor_esp32/`: projeto PlatformIO do servidor e arquivos HTML, CSS e JavaScript.
+- `exemplos/teste_gpio/`: projeto independente para testar entradas e saídas.
+
+O firmware precisa ser compilado e testado em uma placa física. Não aplique 5 V aos GPIOs.
