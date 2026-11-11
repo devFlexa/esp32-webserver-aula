@@ -13,4 +13,4 @@ No terminal do PlatformIO, os comandos equivalentes sao `pio run -t upload`, `pi
 
 Depois de editar HTML, CSS ou JavaScript, execute novamente **Upload Filesystem Image**. Depois de editar `src/main.cpp`, execute **Upload**. O modo ponto de acesso funciona sem roteador ou Internet.
 
-A aula completa pode ser aberta no navegador pelo arquivo `../aula_esp32.html`.
+A aula completa pode ser aberta no navegador pelo arquivo `../index.html`.

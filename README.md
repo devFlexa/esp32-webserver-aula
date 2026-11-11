@@ -1,10 +1,10 @@
-﻿# ESP32 como servidor web — aula prática
+# ESP32 como servidor web — aula prática
 
 Material para jovens de 14 a 16 anos, com diagramas, simulador de requisições HTTP, atividades e quiz.
 
 ## Comece pela aula
 
-Baixe o repositório e abra `aula_esp32.html` no navegador. A aula funciona offline e explica conceitos, montagem, programação e testes.
+Baixe o repositório e abra `index.html` no navegador. A aula funciona offline e explica conceitos, montagem, programação e testes.
 
 ## Projeto da ESP32
 
@@ -20,8 +20,12 @@ Use o Monitor Serial em **115200 baud**. As instruções completas estão no REA
 
 ## Organização
 
-- `aula_esp32.html`: aula ilustrada e interativa.
+- `index.html`: aula ilustrada e interativa.
 - `aula_servidor_esp32/`: projeto PlatformIO do servidor e arquivos HTML, CSS e JavaScript.
 - `exemplos/teste_gpio/`: projeto independente para testar entradas e saídas.
 
 O firmware precisa ser compilado e testado em uma placa física. Não aplique 5 V aos GPIOs.
+
+## GitHub Pages
+
+Em Settings ? Pages, escolha Deploy from a branch, selecione a branch `main` e a pasta `/ (root)`. O arquivo `index.html` na raiz ser? a p?gina inicial da aula.
