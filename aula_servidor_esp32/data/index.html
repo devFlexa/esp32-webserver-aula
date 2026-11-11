@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laboratório ESP32</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <main class="card">
+    <p class="eyebrow">SERVIDOR WEB • ESP32</p>
+    <h1>Controle um LED pelo navegador</h1>
+    <p class="intro">Esta página está armazenada na ESP32. Os botões enviam pedidos HTTP para a placa, que altera o GPIO 21.</p>
+    <div class="status" role="status" aria-live="polite">
+      <span id="indicator" class="indicator"></span>
+      <span id="state">Consultando a ESP32…</span>
+    </div>
+    <div class="actions">
+      <button id="turn-on" type="button">Ligar LED</button>
+      <button id="turn-off" type="button" class="secondary">Desligar LED</button>
+    </div>
+    <p id="message" class="message" aria-live="polite"></p>
+    <div class="note">Circuito: GPIO 21 → resistor de 220 a 1000 Ω → ânodo do LED; cátodo → GND.</div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#10254b">
+  <title>Missão ESP32 — uma página dentro da placa</title>
+  <style>
+    :root { font-family: system-ui, -apple-system, Segoe UI, sans-serif; color: #18304a; background: #f4f7fc; scroll-behavior: smooth; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.6; }
+    button, input { font: inherit; }
+    a { color: #155bba; }
+    a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible { outline: 3px solid #ffbb38; outline-offset: 3px; }
+    .wrap { width: min(1120px, calc(100% - 32px)); margin-inline: auto; }
+    .hero { color: white; background: radial-gradient(circle at 78% 15%, #2966ba 0, transparent 34%), linear-gradient(125deg, #10254b, #193d73 68%, #115e76); overflow: hidden; }
+    .hero-grid { min-height: 420px; padding: 62px 0 52px; display: grid; grid-template-columns: 1.2fr .8fr; align-items: center; gap: 38px; }
+    .eyebrow { margin: 0 0 13px; color: #9bf2d4; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .16em; }
+    h1 { max-width: 680px; margin: 0; font-size: clamp(2.5rem, 5.8vw, 5rem); line-height: 1.04; letter-spacing: -.04em; }
+    .hero p:last-child { max-width: 600px; font-size: 1.2rem; color: #e4eefb; }
+    .hero-art { width: 100%; max-width: 380px; margin: auto; filter: drop-shadow(0 22px 22px #06173077); }
+    .hero-art text { font-family: system-ui, sans-serif; }
+    .topnav { position: sticky; top: 0; z-index: 4; background: #fff; box-shadow: 0 3px 18px #14294e17; }
+    .topnav .wrap { display: flex; gap: 8px 23px; flex-wrap: wrap; padding: 12px 0; }
+    .topnav a { color: #17406c; text-decoration: none; font-size: .9rem; font-weight: 700; }
+    .topnav a:hover { text-decoration: underline; }
+    main { padding: 22px 0 64px; }
+    section { scroll-margin-top: 75px; margin: 19px 0; padding: clamp(23px, 4vw, 42px); background: #fff; border: 1px solid #e4ebf4; border-radius: 22px; box-shadow: 0 7px 26px #122c5210; }
+    h2 { margin: 0 0 10px; color: #143d70; font-size: clamp(1.7rem, 3vw, 2.2rem); line-height: 1.2; }
+    h3 { margin: 0 0 8px; color: #224b78; }
+    p { margin: 9px 0 16px; }
+    .lead { max-width: 75ch; color: #4a6179; font-size: 1.06rem; }
+    .kicker { display: inline-block; margin-bottom: 10px; padding: 5px 10px; color: #155b67; background: #e1f8ef; border-radius: 999px; font-size: .75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .card { padding: 20px; background: #f2f7fd; border: 1px solid #e2ecf8; border-radius: 16px; }
+    .card strong { display: block; margin-bottom: 5px; color: #143d70; }
+    .icon { display: grid; place-items: center; width: 43px; height: 43px; margin-bottom: 10px; border-radius: 12px; background: #dcecff; font-size: 1.4rem; }
+    .timebar { display: flex; flex-wrap: wrap; gap: 8px; margin: 23px 0 0; }
+    .timebar span { padding: 8px 12px; border-radius: 10px; background: #eaf4fc; font-size: .87rem; font-weight: 700; }
+    .diagram { margin: 20px 0; padding: 20px; overflow-x: auto; border: 1px solid #d9e7f3; border-radius: 16px; background: #f8fbff; }
+    .diagram svg { display: block; width: 100%; min-width: 680px; height: auto; }
+    .diagram figcaption { margin-top: 10px; color: #526b83; font-size: .92rem; }
+    .concept-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: center; gap: 12px; margin: 24px 0; }
+    .concept-flow .node { min-height: 106px; display: grid; place-content: center; padding: 16px; border: 2px solid #d8e5f2; border-radius: 15px; background: #f7faff; text-align: center; }
+    .concept-flow .node strong { display: block; color: #153d70; }
+    .concept-flow .arrow { color: #098978; font-size: 2rem; font-weight: 900; }
+    .callout { margin: 18px 0; padding: 16px 18px; border-left: 5px solid #f1af2e; border-radius: 8px; background: #fff8e8; }
+    .callout.good { border-color: #23b28a; background: #ebfaf4; }
+    code { padding: .12em .35em; border-radius: 5px; background: #eaf1f8; font-size: .93em; }
+    pre { overflow-x: auto; margin: 10px 0; padding: 17px; border-radius: 12px; background: #14273e; color: #edf6ff; font-size: .88rem; line-height: 1.52; }
+    pre code { padding: 0; background: transparent; color: inherit; }
+    .four { grid-template-columns: repeat(4, 1fr); }
+    .role { border-top: 5px solid #4e77c2; }
+    .role:nth-child(2) { border-color: #e89a39; }
+    .role:nth-child(3) { border-color: #3bb2a2; }
+    .role:nth-child(4) { border-color: #a16bd5; }
+    .role .tag { display: inline-block; margin-bottom: 8px; font-size: .72rem; font-weight: 800; letter-spacing: .08em; }
+    .simulator { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 22px; border-radius: 17px; background: #eaf3ff; }
+    .simulator .controls { display: flex; flex-wrap: wrap; align-content: start; gap: 9px; }
+    button { padding: 10px 15px; border: 0; border-radius: 9px; background: #155bba; color: #fff; font-weight: 800; cursor: pointer; }
+    button:hover { background: #0f468f; }
+    .simulator .screen { min-height: 180px; padding: 18px; border-radius: 13px; background: #10253d; color: #e5f9f4; }
+    .screen small { color: #8de7d0; font-weight: 800; letter-spacing: .1em; }
+    .screen p { margin: 9px 0; }
+    .bulb { display: inline-block; width: 17px; height: 17px; margin-right: 6px; border-radius: 50%; background: #65798b; vertical-align: middle; }
+    .bulb.on { background: #ffce49; box-shadow: 0 0 0 5px #ffce4940, 0 0 20px #ffce49; }
+    .steps { counter-reset: step; display: grid; gap: 14px; padding: 0; list-style: none; }
+    .steps li { position: relative; min-height: 70px; padding: 15px 18px 15px 66px; border-radius: 13px; background: #f5f8fc; }
+    .steps li::before { counter-increment: step; content: counter(step); position: absolute; left: 17px; top: 16px; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #1765bd; color: white; font-weight: 800; }
+    .steps strong { color: #143d70; }
+    details { margin: 12px 0; border: 1px solid #d8e4f1; border-radius: 12px; background: #fbfdff; }
+    summary { padding: 14px 18px; color: #174a80; font-weight: 800; cursor: pointer; }
+    details > div { padding: 0 18px 18px; }
+    .filetree { margin: 12px 0; }
+    .challenge { padding: 18px; border: 2px dashed #8cb9e7; border-radius: 14px; background: #f7fbff; }
+    .quiz-item { margin: 15px 0; padding: 16px; border: 1px solid #dde8f2; border-radius: 13px; }
+    .quiz-item legend { padding: 0 5px; font-weight: 800; color: #163e70; }
+    .quiz-item label { display: block; margin: 8px 0; cursor: pointer; }
+    .quiz-feedback { min-height: 1.5em; font-weight: 700; }
+    .quiz-feedback.ok { color: #08735a; }
+    .quiz-feedback.try { color: #a94822; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 11px 12px; border-bottom: 1px solid #dce7f1; text-align: left; vertical-align: top; }
+    th { background: #eaf3fb; }
+    footer { padding: 0 20px 35px; text-align: center; color: #60728a; }
+    @media (max-width: 760px) { .hero-grid, .simulator { grid-template-columns: 1fr; } .hero-grid { padding: 42px 0; } .hero-art { max-width: 270px; } .grid, .four { grid-template-columns: 1fr 1fr; } .concept-flow { grid-template-columns: 1fr; } .concept-flow .arrow { transform: rotate(90deg); text-align: center; line-height: 1; } }
+    @media (max-width: 520px) { .grid, .four { grid-template-columns: 1fr; } section { padding: 22px 18px; } .topnav { position: static; } .diagram { padding: 9px; } .diagram figcaption { padding: 0 8px; } table { font-size: .85rem; } }
+    @media print { .topnav, .simulator button, #check-quiz { display: none; } .hero { color: #18304a; background: #fff; } .hero p:last-child { color: #18304a; } .hero-grid { min-height: 0; padding: 15px 0; } .hero-art { width: 180px; } section { break-inside: avoid; box-shadow: none; } details > div { display: block; } }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="eyebrow">Projeto mão na massa · 14 a 16 anos</p>
+        <h1>Uma página web dentro da ESP32</h1>
+        <p>Você vai criar uma rede Wi-Fi, abrir uma página servida pela placa e acender um LED pelo navegador. Sim: a ESP32 será o servidor.</p>
+      </div>
+      <svg class="hero-art" viewBox="0 0 380 360" role="img" aria-labelledby="hero-title hero-desc">
+        <title id="hero-title">Ilustração de uma placa ESP32 conectada a um celular</title>
+        <desc id="hero-desc">Ondas de Wi-Fi ligam a placa a uma tela com botões para controlar um LED.</desc>
+        <path d="M190 93 Q260 20 330 93 M215 109 Q260 62 305 109 M240 125 Q260 103 280 125" fill="none" stroke="#8cead2" stroke-width="6" stroke-linecap="round"/>
+        <rect x="45" y="92" width="185" height="230" rx="20" fill="#0b172f" stroke="#8cead2" stroke-width="4"/>
+        <rect x="67" y="114" width="141" height="185" rx="9" fill="#226a7b"/>
+        <rect x="87" y="135" width="101" height="67" rx="7" fill="#d4eef2"/><text x="101" y="174" fill="#16334e" font-size="18" font-weight="800">ESP32</text>
+        <g fill="#e7b955"><circle cx="58" cy="134" r="5"/><circle cx="58" cy="164" r="5"/><circle cx="58" cy="194" r="5"/><circle cx="58" cy="224" r="5"/><circle cx="58" cy="254" r="5"/><circle cx="217" cy="134" r="5"/><circle cx="217" cy="164" r="5"/><circle cx="217" cy="194" r="5"/><circle cx="217" cy="224" r="5"/><circle cx="217" cy="254" r="5"/></g>
+        <rect x="250" y="158" width="105" height="155" rx="17" fill="#e8f6ff" stroke="#75d5ca" stroke-width="4"/><rect x="262" y="177" width="81" height="106" rx="7" fill="#fff"/>
+        <circle cx="303" cy="209" r="13" fill="#ffc852"/><rect x="272" y="240" width="62" height="18" rx="9" fill="#176bb0"/><circle cx="302" cy="299" r="5" fill="#8ca8bb"/>
+      </svg>
+    </div>
+  </header>
+  <nav class="topnav" aria-label="Navegação da aula"><div class="wrap">
+    <a href="#missao">Missão</a><a href="#entenda">Entenda</a><a href="#simule">Simule</a><a href="#circuito">Circuito</a><a href="#codigo">Código</a><a href="#pratica">Prática</a><a href="#desafio">Desafio</a><a href="#quiz">Quiz</a>
+  </div></nav>
+  <main class="wrap">
+    <section id="missao">
+      <span class="kicker">Comece aqui</span>
+      <h2>Qual é a missão?</h2>
+      <p class="lead">Imagine controlar uma luz sem instalar aplicativo: basta entrar na rede da placa e abrir uma página. Ao terminar, você terá um protótipo que pode mostrar para outra pessoa usando o celular dela.</p>
+      <div class="grid">
+        <div class="card"><span class="icon" aria-hidden="true">📱</span><strong>1. Abra a página</strong>O navegador pede os arquivos à ESP32.</div>
+        <div class="card"><span class="icon" aria-hidden="true">🌐</span><strong>2. Envie um comando</strong>Um botão faz um pedido HTTP para ligar ou desligar.</div>
+        <div class="card"><span class="icon" aria-hidden="true">💡</span><strong>3. Veja o resultado</strong>O programa muda o GPIO 21 e o LED responde.</div>
+      </div>
+      <div class="timebar"><span>⏱️ 2 aulas de 45 minutos</span><span>🧩 HTML + CSS + JavaScript + Arduino</span><span>🔌 Sem roteador e sem Internet</span></div>
+    </section>
+
+    <section id="entenda">
+      <span class="kicker">Ideia central</span>
+      <h2>O que significa “servidor”?</h2>
+      <p>O <strong>cliente</strong> é o navegador: ele pede algo. O <strong>servidor</strong> é a ESP32: ela recebe o pedido e responde. Pense em uma biblioteca: você solicita um livro pelo nome, e a biblioteca encontra e entrega o livro certo.</p>
+      <div class="concept-flow" aria-label="Fluxo entre navegador e ESP32">
+        <div class="node"><strong>📱 Navegador</strong><small>“Quero abrir a página”</small></div><span class="arrow" aria-hidden="true">→</span>
+        <div class="node"><strong>📨 Pedido HTTP</strong><small>GET /</small></div><span class="arrow" aria-hidden="true">→</span>
+        <div class="node"><strong>🧠 ESP32</strong><small>Responde com HTML</small></div>
+      </div>
+      <p>Depois, o navegador pede <code>/style.css</code> para receber as cores e o layout. Quando você clica em <strong>Ligar LED</strong>, ele envia outro pedido: <code>POST /api/led/on</code>.</p>
+      <div class="callout good"><strong>Uma distinção útil:</strong> a ESP32 guarda e entrega os arquivos da página; o navegador desenha a página na tela. A placa não precisa de uma tela própria.</div>
+      <h3>Quem faz o quê?</h3>
+      <div class="grid four">
+        <div class="card role"><span class="tag">HTML</span><strong>Estrutura</strong>Título, texto, indicador e botões.</div>
+        <div class="card role"><span class="tag">CSS</span><strong>Aparência</strong>Cores, espaços, fontes e layout.</div>
+        <div class="card role"><span class="tag">JAVASCRIPT</span><strong>Interação</strong>Envia o pedido ao clicar.</div>
+        <div class="card role"><span class="tag">C++ / ARDUINO</span><strong>Ação física</strong>Recebe o pedido e muda o pino.</div>
+      </div>
+    </section>
+
+    <section id="simule">
+      <span class="kicker">Experimente antes de ligar a placa</span>
+      <h2>Simulador de pedidos</h2>
+      <p>Escolha um pedido e observe a rota, a resposta e o LED. <strong>Esta simulação funciona só neste arquivo:</strong> ela não se conecta à ESP32.</p>
+      <div class="simulator">
+        <div><h3>O navegador pede:</h3><div class="controls">
+          <button type="button" data-route="page">Abrir página</button>
+          <button type="button" data-route="on">Ligar LED</button>
+          <button type="button" data-route="off">Desligar LED</button>
+          <button type="button" data-route="status">Ver estado</button>
+        </div><p>Perceba: abrir uma página usa <code>GET</code>; mudar o estado do LED usa <code>POST</code>.</p></div>
+        <div class="screen" aria-live="polite"><small>RESPOSTA DA ESP32 (SIMULAÇÃO)</small><p id="sim-request">Escolha um botão.</p><p id="sim-response">A resposta aparecerá aqui.</p><p><span class="bulb" id="sim-bulb"></span><span id="sim-led">LED desligado</span></p></div>
+      </div>
+    </section>
+
+    <section id="circuito">
+      <span class="kicker">Parte física</span>
+      <h2>Monte o circuito do LED</h2>
+      <p>Você precisa de uma <strong>ESP32 DevKit (ESP32-WROOM)</strong>, cabo USB de dados, LED, resistor de <strong>220 a 1000 Ω</strong> e fios. Monte com a placa desconectada do USB.</p>
+      <figure class="diagram">
+        <svg viewBox="0 0 780 320" role="img" aria-labelledby="wire-title wire-desc">
+          <title id="wire-title">Ligação em série entre ESP32, resistor e LED</title>
+          <desc id="wire-desc">O fio sai do GPIO 21 da ESP32, passa por um resistor de 220 a 1000 ohms, chega ao ânodo do LED e retorna do cátodo ao GND da mesma placa.</desc>
+          <!-- A placa tem dois pontos de conexão claramente separados. -->
+          <rect x="20" y="36" width="210" height="244" rx="18" fill="#17385d"/>
+          <rect x="53" y="71" width="130" height="94" rx="9" fill="#315d81"/>
+          <text x="71" y="122" fill="#fff" font-size="31" font-weight="800">ESP32</text>
+          <rect x="166" y="91" width="78" height="30" rx="5" fill="#e1f7f0"/>
+          <text x="174" y="112" fill="#17385d" font-size="16" font-weight="800">GPIO 21</text>
+          <rect x="166" y="245" width="78" height="30" rx="5" fill="#e1f7f0"/>
+          <text x="184" y="266" fill="#17385d" font-size="17" font-weight="800">GND</text>
+          <!-- Caminho contínuo: GPIO -> resistor -> ânodo -> LED -> cátodo -> GND. -->
+          <path d="M244 106 H318 M443 106 H520 M600 106 H720 V260 H244" fill="none" stroke="#1686c4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="318" y="84" width="125" height="44" rx="5" fill="#fff2ce" stroke="#9b6c16" stroke-width="4"/>
+          <text x="334" y="111" fill="#654719" font-size="19" font-weight="800">RESISTOR</text>
+          <circle cx="560" cy="106" r="40" fill="#ffdf83" stroke="#bd7712" stroke-width="4"/>
+          <text x="539" y="113" fill="#59400e" font-size="20" font-weight="900">LED</text>
+          <circle cx="520" cy="106" r="5" fill="#1686c4"/>
+          <circle cx="600" cy="106" r="5" fill="#1686c4"/>
+          <text x="318" y="160" fill="#425b73" font-size="18">220 a 1000 Ω</text>
+          <text x="490" y="177" fill="#425b73" font-size="17">ânodo (+)</text>
+          <text x="592" y="177" fill="#425b73" font-size="17">cátodo (−)</text>
+          <text x="362" y="243" fill="#425b73" font-size="17">fio de retorno ao GND</text>
+        </svg>
+        <figcaption>Um só caminho: <strong>GPIO 21 → resistor → ânodo (+) do LED → cátodo (−) → GND</strong>. O resistor limita a corrente. No LED comum, o ânodo costuma ser a perna longa; o cátodo, a perna curta e o lado achatado.</figcaption>
+      </figure>
+      <div class="callout"><strong>Cuidados:</strong> use o GND da mesma placa e nunca aplique 5 V diretamente a um GPIO. Se sua ESP for C3, S3 ou outro modelo, confira o mapa de pinos e ajuste o projeto antes de gravar.</div>
+      <p><strong>Previsão:</strong> o que deve acontecer quando o GPIO 21 passa de <code>LOW</code> para <code>HIGH</code>? Faça sua hipótese antes de testar.</p>
+    </section>
+
+    <section id="codigo">
+      <span class="kicker">Mapa do projeto</span>
+      <h2>Encontre cada parte do código</h2>
+      <p>O projeto pronto está na pasta <a href="aula_servidor_esp32/README.md">aula_servidor_esp32</a>. Abra essa pasta no VS Code. Os arquivos da página ficam em <code>data/</code>; o programa da placa fica em <code>src/</code>.</p>
+      <pre class="filetree"><code>aula_servidor_esp32/
+├── platformio.ini       modelo da placa e SPIFFS
+├── src/main.cpp         servidor, rotas e LED
+└── data/
+    ├── index.html       conteúdo
+    ├── style.css        visual
+    └── app.js           cliques e pedidos HTTP</code></pre>
+      <p>Abra os trechos abaixo e procure as mesmas linhas nos arquivos reais. Você não precisa decorar tudo: tente descobrir a função de cada parte.</p>
+      <details><summary>1. HTML: o que aparece na página?</summary><div><pre><code>&lt;h1&gt;Controle um LED pelo navegador&lt;/h1&gt;
+&lt;button id="turn-on"&gt;Ligar LED&lt;/button&gt;
+&lt;button id="turn-off"&gt;Desligar LED&lt;/button&gt;</code></pre><p>O <code>id</code> dá um nome único ao botão. O JavaScript usa esse nome para detectar o clique. Veja o <a href="aula_servidor_esp32/data/index.html">HTML completo</a>.</p></div></details>
+      <details><summary>2. CSS: por que a página não parece texto puro?</summary><div><pre><code>button {
+  background: #087b68;
+  color: #fff;
+  border-radius: 10px;
+}</code></pre><p>Essa regra pinta todos os botões e arredonda os cantos. Experimente mudar a cor em <a href="aula_servidor_esp32/data/style.css">style.css</a>.</p></div></details>
+      <details><summary>3. JavaScript: como o clique vira um pedido?</summary><div><pre><code>fetch('/api/led/on', { method: 'POST' });</code></pre><p><code>fetch</code> envia o pedido para a ESP32. O arquivo <a href="aula_servidor_esp32/data/app.js">app.js</a> também lê a resposta e atualiza o indicador na tela.</p></div></details>
+      <details><summary>4. Arduino: como a ESP32 recebe e age?</summary><div><pre><code>server.on("/api/led/on", HTTP_POST, []() { setLed(true); });
+digitalWrite(LED_PIN, HIGH);</code></pre><p>A primeira linha associa uma rota a uma ação. A segunda representa a mudança elétrica no pino. Leia <a href="aula_servidor_esp32/src/main.cpp">main.cpp</a>.</p></div></details>
+      <div class="callout good"><strong>Por que há dois envios?</strong> <em>Upload</em> grava o programa da ESP32. <em>Upload Filesystem Image</em> grava os arquivos HTML, CSS e JavaScript da pasta <code>data/</code>.</div>
+    </section>
+
+    <section id="pratica">
+      <span class="kicker">Hora de fazer</span>
+      <h2>Da placa à página, passo a passo</h2>
+      <p class="lead">A <strong>ESP32</strong> é um microcontrolador: um pequeno computador que executa um programa e conversa com componentes eletrônicos. Nesta atividade, vamos enviar <strong>duas partes</strong> para ela: o programa que controla o LED e os arquivos da página que aparecem no navegador.</p>
+      <div class="grid">
+        <div class="card"><span class="icon" aria-hidden="true">🧰</span><strong>VS Code + PlatformIO</strong><em>VS Code</em> significa Visual Studio Code: é o editor de código. <em>PlatformIO</em> é a extensão que organiza o projeto, compila o programa e o envia à placa.</div>
+        <div class="card"><span class="icon" aria-hidden="true">🧠</span><strong>Programa da placa</strong>O arquivo <code>src/main.cpp</code> vira o <em>firmware</em>: o programa que roda na ESP32. O botão <em>Upload</em> grava esse firmware.</div>
+        <div class="card"><span class="icon" aria-hidden="true">📁</span><strong>Arquivos da página</strong>HTML, CSS e JavaScript estão em <code>data/</code>. Eles vão para uma área da memória <em>flash</em> chamada <strong>SPIFFS</strong> (sistema de arquivos na memória da placa).</div>
+      </div>
+      <div class="callout good"><strong>Guarde esta diferença:</strong> mudou <code>main.cpp</code>? Faça <em>Upload</em>. Mudou um arquivo da pasta <code>data/</code>? Faça <em>Upload Filesystem Image</em>. Para mudanças nas duas partes, repita os dois envios.</div>
+      <ol class="steps">
+        <li><strong>Abra a pasta do projeto.</strong> No VS Code, use <em>File → Open Folder</em> (Arquivo → Abrir Pasta) e escolha <code>aula_servidor_esp32</code>. O arquivo <code>platformio.ini</code> informa ao PlatformIO qual é a placa (<code>esp32dev</code>), qual é o framework (<code>arduino</code>) e como preparar os arquivos. <strong>Confira:</strong> você consegue ver as pastas <code>src</code> e <code>data</code> no explorador?</li>
+        <li><strong>Conecte e grave o programa.</strong> Use um cabo USB <em>de dados</em> para conectar a ESP32. Em <em>PlatformIO → Project Tasks → esp32dev</em>, execute <em>Upload</em> (enviar). O PlatformIO compila o C++ em instruções para a placa e grava o firmware na memória flash. <strong>Confira:</strong> a tarefa termina com uma mensagem de sucesso, sem erro em vermelho?</li>
+        <li><strong>Envie os arquivos da página.</strong> No mesmo menu de tarefas, execute <em>Upload Filesystem Image</em>. <em>Filesystem</em> significa “sistema de arquivos”: o PlatformIO empacota <code>index.html</code>, <code>style.css</code> e <code>app.js</code> da pasta <code>data/</code> e os grava no <strong>SPIFFS</strong> (<em>SPI Flash File System</em>). A flash guarda esses arquivos mesmo depois de desligar a placa. <strong>Confira:</strong> essa segunda tarefa também termina com sucesso?</li>
+        <li><strong>Leia o que a placa informa.</strong> Abra o <em>Serial Monitor</em>, uma janela que mostra mensagens enviadas pela ESP32 pelo cabo USB. Ajuste para <strong>115200 baud</strong>: <em>baud</em> é a velocidade de comunicação; o monitor e o programa precisam usar o mesmo valor para o texto aparecer corretamente. Procure <code>Abra: http://192.168.4.1</code>. <strong>Confira:</strong> aparece também o nome da rede <code>ESP32-Aula</code>?</li>
+        <li><strong>Conecte-se à rede da ESP32.</strong> No Wi-Fi do celular ou computador, escolha <strong>ESP32-Aula</strong> e digite <strong>AulaESP32</strong>. A placa está funcionando como <em>ponto de acesso</em>: ela cria sua própria rede, sem precisar de roteador. <strong>Confira:</strong> o aparelho permanece conectado mesmo que apareça o aviso “sem Internet”?</li>
+        <li><strong>Abra e teste a página.</strong> No navegador, digite <strong>http://192.168.4.1</strong>. Esse número é o <strong>endereço IP</strong> (<em>Internet Protocol</em>) da ESP32 dentro da rede que ela criou; <strong>HTTP</strong> (<em>Hypertext Transfer Protocol</em>) é a forma como navegador e servidor trocam pedidos e respostas. Aperte <em>Ligar LED</em> e <em>Desligar LED</em>. <strong>Confira:</strong> o LED real e o indicador da página mudam juntos?</li>
+      </ol>
+      <h3>Mini dicionário para consultar durante a prática</h3>
+      <table><thead><tr><th>Nome</th><th>O que significa aqui</th></tr></thead><tbody>
+        <tr><td><strong>USB</strong></td><td><em>Universal Serial Bus</em>: cabo usado para alimentar a placa e transferir o programa e as mensagens.</td></tr>
+        <tr><td><strong>GPIO</strong></td><td><em>General Purpose Input/Output</em>: pino que o programa pode usar como entrada ou saída. O GPIO 21 liga e desliga o LED.</td></tr>
+        <tr><td><strong>LED</strong></td><td><em>Light Emitting Diode</em>: componente que emite luz. Ele tem polaridade, por isso a posição das pernas importa.</td></tr>
+        <tr><td><strong>HTML / CSS</strong></td><td><em>HyperText Markup Language</em> organiza o conteúdo da página; <em>Cascading Style Sheets</em> define a aparência.</td></tr>
+        <tr><td><strong>Framework Arduino</strong></td><td>Conjunto de funções prontas, como <code>digitalWrite</code>, que facilita programar a ESP32 em C++.</td></tr>
+      </tbody></table>
+      <p><strong>Quer usar comandos?</strong> No terminal aberto <em>dentro da pasta <code>aula_servidor_esp32</code></em>, estes são os equivalentes aos três botões do PlatformIO: enviar programa, enviar página e abrir o monitor.</p>
+      <pre><code>pio run -t upload
+pio run -t uploadfs
+pio device monitor -b 115200</code></pre>
+      <p><code>pio</code> é o comando do PlatformIO; <code>uploadfs</code> significa “enviar o sistema de arquivos”. Se o comando <code>pio</code> não for reconhecido, use os botões da extensão no VS Code.</p>
+      <h3>Se algo não funcionar</h3>
+      <table><thead><tr><th>O que você vê</th><th>O que conferir</th></tr></thead><tbody>
+        <tr><td>A rede não aparece</td><td>Alimentação USB, modelo da placa e mensagem no Serial Monitor.</td></tr>
+        <tr><td>O celular diz “sem Internet”</td><td>Permaneça conectado à rede ESP32-Aula. A página está na placa.</td></tr>
+        <tr><td>“Arquivo não encontrado no SPIFFS”</td><td>Execute <em>Upload Filesystem Image</em> e recarregue a página.</td></tr>
+        <tr><td>A página abre, mas o LED não acende</td><td>GPIO 21, GND, polaridade do LED e resistor em série.</td></tr>
+      </tbody></table>
+    </section>
+
+    <section id="desafio">
+      <span class="kicker">Agora é seu projeto</span>
+      <h2>Mude, teste, explique</h2>
+      <div class="grid">
+        <div class="challenge"><h3>Nível 1 · Visual</h3><p>Troque o título no <code>index.html</code> e a cor dos botões no <code>style.css</code>. Envie o sistema de arquivos de novo. O que mudou sem editar <code>main.cpp</code>?</p></div>
+        <div class="challenge"><h3>Nível 2 · Investigação</h3><p>Visite <code>http://192.168.4.1/api/status</code> antes e depois de ligar o LED. Compare as respostas <code>true</code> e <code>false</code>.</p></div>
+        <div class="challenge"><h3>Nível 3 · Autoria</h3><p>Crie na página uma seção “Como funciona” com três passos. Mostre a alguém o caminho do clique até o GPIO 21.</p></div>
+      </div>
+      <div class="callout good"><strong>Entrega da dupla:</strong> mostre o circuito funcionando, a página com uma alteração visual e explique em uma frase o que fazem HTML, CSS e o servidor.</div>
+    </section>
+
+    <section id="quiz">
+      <span class="kicker">Cheque o que aprendeu</span>
+      <h2>Quiz rápido</h2>
+      <p>Responda e clique em <strong>Conferir respostas</strong>. Você pode tentar de novo.</p>
+      <form id="quiz-form">
+        <fieldset class="quiz-item"><legend>1. Quem entrega o arquivo HTML quando o navegador pede a página?</legend>
+          <label><input type="radio" name="q1" value="a"> O LED</label>
+          <label><input type="radio" name="q1" value="b"> A ESP32, atuando como servidor</label>
+          <label><input type="radio" name="q1" value="c"> O resistor</label>
+        </fieldset>
+        <fieldset class="quiz-item"><legend>2. Qual arquivo você edita para mudar a cor dos botões?</legend>
+          <label><input type="radio" name="q2" value="a"> style.css</label>
+          <label><input type="radio" name="q2" value="b"> platformio.ini</label>
+          <label><input type="radio" name="q2" value="c"> main.cpp</label>
+        </fieldset>
+        <fieldset class="quiz-item"><legend>3. Você editou apenas o HTML. Qual envio precisa repetir?</legend>
+          <label><input type="radio" name="q3" value="a"> Só o Monitor Serial</label>
+          <label><input type="radio" name="q3" value="b"> Upload Filesystem Image</label>
+          <label><input type="radio" name="q3" value="c"> Nenhum: a placa atualiza sozinha</label>
+        </fieldset>
+        <button type="submit" id="check-quiz">Conferir respostas</button>
+        <p id="quiz-feedback" class="quiz-feedback" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+  </main>
+  <footer>Aula offline em HTML · O projeto PlatformIO está na pasta aula_servidor_esp32</footer>
+  <script>
+    (() => {
+      let ledOn = false;
+      const request = document.getElementById('sim-request');
+      const response = document.getElementById('sim-response');
+      const bulb = document.getElementById('sim-bulb');
+      const led = document.getElementById('sim-led');
+      document.querySelectorAll('[data-route]').forEach(button => button.addEventListener('click', () => {
+        const route = button.dataset.route;
+        if (route === 'page') {
+          request.textContent = 'Pedido: GET /';
+          response.textContent = 'Resposta: HTML da página (depois, o navegador pede o CSS e o JS).';
+        } else {
+          if (route === 'on') ledOn = true;
+          if (route === 'off') ledOn = false;
+          request.textContent = `Pedido: ${route === 'status' ? 'GET /api/status' : `POST /api/led/${route}`}`;
+          response.textContent = `Resposta JSON: {"ligado":${ledOn}}`;
+        }
+        bulb.classList.toggle('on', ledOn);
+        led.textContent = ledOn ? 'LED ligado' : 'LED desligado';
+      }));
+
+      document.getElementById('quiz-form').addEventListener('submit', event => {
+        event.preventDefault();
+        const correct = { q1: 'b', q2: 'a', q3: 'b' };
+        const chosen = new FormData(event.currentTarget);
+        const score = Object.entries(correct).filter(([question, answer]) => chosen.get(question) === answer).length;
+        const feedback = document.getElementById('quiz-feedback');
+        feedback.className = `quiz-feedback ${score === 3 ? 'ok' : 'try'}`;
+        feedback.textContent = score === 3
+          ? '3 de 3! Você já consegue explicar o caminho da página até a placa.'
+          : `${score} de 3. Revise: a ESP32 entrega o HTML, o CSS muda as cores e os arquivos da pasta data precisam de Upload Filesystem Image.`;
+      });
+    })();
+  </script>
+</body>
+</html>
